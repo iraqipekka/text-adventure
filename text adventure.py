@@ -14,11 +14,12 @@ def insert_item(item):
 
         if inventory[slot] is None:
             inventory[slot] = item
-            print(f"Picked up {item}")
+            print(f"[Aquired] {item}")
             return
-        else:
-            print("Inventory is full")
-            return
+
+    print("Inventory is full")
+    
+
 
 def remove_item(item):
 
@@ -26,12 +27,11 @@ def remove_item(item):
 
         if inventory[slot] == item:
             inventory[slot] = None
-            print(f"Dropped {item} from inventory")
-            return
-        else:
-            print("Nothing in inventory")
+            print(f"[Dropped] {item}")
             return
 
+    print("Nothing in inventory")
+    
 
 def tutorial():
 
@@ -45,38 +45,41 @@ def tutorial():
 
                 clear()
 
-                if "key00" in inventory.values():
+                if "key" in inventory.values():
 
                     clear()
-                    remove_item("key00")
+                    remove_item("key")
                     input("The door unlocks. The opening is completely white, not allowing you to see anything. Letting your curiosity get the better of you, you step in. \n [Enter]")
                     print("[SYSTEM] TUTORIAL FINISHED")
                     return
 
                 input("You try the door, it's locked. \n [Enter] Go back")
                 clear()
-                True
             case 2: 
 
                 clear()
 
                 drawer = int(input("You turn left into the hallway. In front of you is a drawer. \n 1. Open the drawer \n 2. Go back "))
 
-                if drawer == 1: 
-                    clear()
-                    insert_item("key00")
-                    input("You open the drawer, inside of it is a key. You pick it up \n [Aquired key] \n [Enter] Go back")
-                    clear()
-                    True
-                elif drawer == 2:
-                    clear()
-                    True
+                match drawer:
+                    case 1:
+                        if "key" in inventory.values():
+                            clear()
+                            input("The drawer is empty \n [Enter] Go back")
+                            clear()
+                        else:
+                            clear()
+                            insert_item("key")
+                            print(inventory)
+                            input("You open the drawer, inside of it is a key. \n [Enter] Go back")
+                            clear()
+
+                    case 2: 
+                        clear()
 
 def clear():
 
     print("\033[H\033[J", end="")
-    return
 
-
-
+clear()
 tutorial()
