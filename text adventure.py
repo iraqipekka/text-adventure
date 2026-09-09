@@ -70,7 +70,6 @@ def tutorial():
                         else:
                             clear()
                             insert_item("key")
-                            print(inventory)
                             input("You open the drawer, inside of it is a key. \n [Enter] Go back")
                             clear()
 
