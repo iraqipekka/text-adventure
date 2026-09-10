@@ -1,6 +1,6 @@
-#Handle player input to trigger different events and tasks such as moving to different areas or interacting with items etc.
-#Handle different scenes (ex. area, combat) and run different code depending on where the player is using functions.
-#Be able to store items permanently in an inventory using lists or dictionaries.
+#Add more options to combat (use item, run)
+#Add a view inventory button
+#Start the next area (town) and add the first quest
 #Be able to save and load game progress eventually using json.
 #Add as you go.
 import random
@@ -17,7 +17,7 @@ class Player:
 
 class Wolf:
 
-    def __init__(self, hp = 6, dmg = 3, hitrate = 6, name = "Wolf"):
+    def __init__(self, hp = 12, dmg = 3, hitrate = 6, name = "Wolf"):
         self.hp = hp
         self.dmg = dmg
         self.name = name
@@ -28,7 +28,7 @@ class Wolf:
 
 class Bear:
 
-    def __init__(self, hp = 15, dmg = 4, hitrate = 7, name = "Bear"):
+    def __init__(self, hp = 25, dmg = 4, hitrate = 7, name = "Bear"):
         self.hp = hp
         self.dmg = dmg
         self.name = name
@@ -49,14 +49,31 @@ class Dagger:
     def unequip(self, player):
         player.atk -= self.dmg
 
+    def __str__(self):
+        return self.name
+
+class Potion:
+
+    def __init__(self, heal = 5, name = "Potion"):
+        self.heal = heal
+        self.name = name
+
+    def healing(self, player):
+        player.hp += self.heal
+        input(f"Used {self.name}. You healed for {self.heal} health \n [Enter]")
+
+    def __str__(self):
+        return self.name
+        
 
 
 
 
 player = Player()
-wolf = Wolf()
-bear = Bear()
 dagger = Dagger()
+potion1 = Potion()
+wolf1 = Wolf()
+
 
 
 inventory = {1 : None , 2 : None, 3 : None, 4 : None, 5 : None}
@@ -85,15 +102,39 @@ def remove_item(item):
             print(f"[Dropped {item}]")
             return
 
-    print("Nothing in inventory")
+    print("Nothing in slot")
+
+def use_item():
+
+    clear()
+    show_inventory()
+    choice = int(input("Use an item \n"))
     
+    item = inventory[choice]
+
+    if item == potion1:
+        item.healing(player)
+        return item
+    else:
+        input("Nothing usable in slot \n [Enter]")
+        clear()
+    
+
+def show_inventory():
+
+    print("{", end="")
+
+    for slot, item in inventory.items():
+        print(f"{slot}: {item}", end=" ")
+
+    print("}")
+
 
 def tutorial():
 
     while True:
 
-        action = int(input("You wake up in strange room, there is a door in front of you, to your left is a strange hallway. \n 1. Try the door \n 2. Turn left into the hallway \n"))
-
+        action = int(input("You wake up in strange room, there is a door in front of you, to your left is a strange hallway. \n 1. Try the door \n 2. Turn left into the hallway \n 0. Inventory \n"))
 
         match action:
             case 1:
@@ -114,7 +155,7 @@ def tutorial():
 
                 clear()
 
-                drawer = int(input("You turn left into the hallway. In front of you is a drawer. \n 1. Open the drawer \n 2. Go back "))
+                drawer = int(input("You turn left into the hallway. In front of you is a drawer. \n 1. Open the drawer \n 2. Go back \n "))
 
                 match drawer:
                     case 1:
@@ -127,9 +168,17 @@ def tutorial():
                             insert_item("key")
                             input("You open the drawer, inside of it is a key. \n [Enter] Go back")
                             clear()
-
-                    case 2: 
+                    case _:
                         clear()
+
+                    
+            case 0:
+                clear()
+                show_inventory()
+                
+            case _:
+                clear()
+
 
 def clear():
 
@@ -143,7 +192,7 @@ def combat(enemy):
     while player.hp > 0 and enemy.hp > 0:
 
         showCombatStatus(player, enemy)
-        fightact = int(input("1. Attack \n"))
+        fightact = int(input("\n 1. Attack \n 2. Item \n 3. Run \n"))
 
         enemyhitrate = random.randint(0,10)
         playerhitrate = random.randint(0,10)
@@ -166,6 +215,17 @@ def combat(enemy):
                     clear()
                     showCombatStatus(player, enemy)
                     input("You missed \n [Enter]")
+            case 2:
+
+                if use_item() == potion1:
+                    remove_item(potion1)
+                    continue
+                else:
+                    continue
+                    clear()
+            case _: 
+                clear()
+                continue
 
         if enemyhitrate > enemy.hitrate:
             clear()
@@ -196,40 +256,52 @@ def forest():
 
     while True:
 
-        action = int(input("Passing through the door, you find yourself in a forest of sorts. in front of you are three paths. \n 1. Path one \n 2. Path two \n 3. Path three \n"))
+        action = int(input("You find yourself in a forest. in front of you are three paths. \n 1. Path one \n 2. Path two \n 3. Path three \n 0. Inventory \n"))
 
         match action:
             case 1:
+                #If the quest is done then it opens
                 clear()
                 input("Theres a large gate blocking the way, you're not cool enough to open it yet. \n [Enter] Go back")
                 clear()
             case 2:
                 clear()
-                fight = int(input("Theres a pathway leading to a small town, a wolf is roaming around on it. \n 1. Press the wolf \n 2. Go back "))
+                fight = int(input("Theres a pathway leading to a small town, a wolf is roaming around on it. \n 1. Press the wolf \n 2. Go back \n "))
 
                 match fight:
                     case 1:
                             clear()
 
-                            if  combat(wolf) == "Win":
-                                #Goto next area
+                            if  combat(wolf1) == "Win":
+                                #Goto next area (town)
                                 clear()
                             else:
                                 forest()
-                    case 2: 
-                       clear()
+                    case _: 
+                        clear()
             case 3:
                 clear()
                 box = int(input("In front of you is a wooden chest. Open it? \n 1. Yes \n 2. No \n "))
 
                 if box == 1:
-                    insert_item(dagger.name)
-                    print(inventory)
+
+                    if dagger in inventory.values():
+                        clear()
+                        input("The box is empty")
+                        clear()
+                        continue
+
+                    
+                    insert_item(dagger)
+                    dagger.equip(player)
+                    insert_item(potion1)
                     input("[Enter] Go back")
                     clear()
                 else:
                     clear()
-
+            case 0:
+                clear()
+                show_inventory()
 
 
 
