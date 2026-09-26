@@ -104,7 +104,7 @@ class bigPotion:
 
 class Dragon:
 
-    def __init__(self, hp = 100, dmg = 12, hitrate = 5, name = "The Dragon"):
+    def __init__(self, hp = 100, dmg = 12, hitrate = 5, name = "Dragon"):
         self.hp = hp
         self.dmg = dmg
         self.hitrate = hitrate
